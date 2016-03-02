@@ -44,13 +44,14 @@ digit		     [0-9]
 id			[A-Za-z][0-9A-Za-z]*
 number	{digit}+(\.{digit}+)?(E[+-]?{digit}+)?
 
-%s COMMENT
+%s COMMENT1 COMMENT2
 %%
-<INITIAL>"/*"						{BEGIN COMMENT;}
-<COMMENT>"*/"						{BEGIN INITIAL;}
-<INITIAL>"//"           {BEGIN COMMENT;}
-<COMMENT>\n             {BEGIN INITIAL;}
-<COMMENT>.|\n                    {;}
+<INITIAL>"/*"						{BEGIN COMMENT1;}
+<COMMENT1>"*/"						{BEGIN INITIAL;}
+<COMMENT1>.|\n                    {;}
+<INITIAL>"//"           {BEGIN COMMENT2;}
+<COMMENT2>\n             {BEGIN INITIAL;}
+<COMMENT2>.|\n                    {;}
  /* ECHO是一个宏，相当于 fprintf(yyout, "%s", yytext)*/
 <INITIAL>{ws}	                     {return WS;}
 
