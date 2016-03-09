@@ -1,48 +1,56 @@
 %{
 #include <stdio.h> 
+
 #define IF 1
-#define WHILE 2
-#define RETURN 3 
-#define IDENT 4 
-#define TRUE 5 
-#define FALSE 6 
-#define UNOP 7
-#define BIOP 8
-/*小括号*/
-#define SKUOHAO 9
-/*中括号*/
-#define MKUOHAO 10
-/*大括号*/
-#define LKUOHAO 11
-/*结构体 STRUCT*/
-#define STRUCT 12
-#define DOUHAO 13
-#define DIANHAO 14
-#define FENHAO 15
-#define INT  16
-#define INTCONST 17
-#define RELOP 18
-#define BOOL 19
-#define DO 20
-#define ELSE 21
-#define WS 22
-#define NEWLINE            23
-#define ERRORCHAR         24
+#define ELSE 2
+#define WHILE 3
+#define RETURN 4
+#define INT 5
+#define BOOL 6
+#define STRUCT 7
+#define TRUE 8
+#define FALSE 9
+
+#define EQ 10
+#define NE 11
+#define LT 12
+#define GT 13
+#define LE 14
+#define GE 15
+
+#define LPARENTHESIS 16
+#define RPARENTHESIS 17
+#define LBRACKET 18
+#define RBRACKET 19
+#define LBRACE 20
+#define RBRACE 21
+
+#define COMMA 22
+#define SEMICOLON 23
+
+#define PLUS 24
+#define MINUS 25
+#define MULTI 26
+#define DIVIDE 27
+#define MOD 28
+#define ASSIGN 29
+#define AND 30
+#define OR 31
+#define NOT 32
+
+#define IDENT 33
+#define NUMBER 34
+#define WS 35
+#define NEWLINE 36
+#define ERRORCHAR 37
+
 %}
 /*变量*/
 ident [A-Za-z][0-9A-Za-z]
 /*整型常量*/
-int [0-9][0-9]*
-unop [-|!]
-biop [+ | - | * | / | % | < | <= | >= | > | == | != | && | \|\|]
-
-
+number [0-9][0-9]*
 delim		[ \t \n]
 ws			{delim}+
-letter	    [A-Za-z]
-digit		     [0-9]
-id			[A-Za-z][0-9A-Za-z]*
-number	{digit}+(\.{digit}+)?(E[+-]?{digit}+)?
 
 %s COMMENT1 COMMENT2
 %%
@@ -55,46 +63,46 @@ number	{digit}+(\.{digit}+)?(E[+-]?{digit}+)?
  /* ECHO是一个宏，相当于 fprintf(yyout, "%s", yytext)*/
 <INITIAL>{ws}	                     {return WS;}
 
-
-<INITIAL>"while"				{return (WHILE);}
-<INITIAL>"do"		                {return (DO);}
 <INITIAL>"if"	                  {return (IF);}
 <INITIAL>"else"		          {return (ELSE);}
+<INITIAL>"while"				{return (WHILE);}
 <INITIAL>"struct"	          {return (STRUCT);}
 <INITIAL>"int"	              {return (INT);}
 <INITIAL>"bool"	              {return (BOOL);}
+<INITIAL>"true"         {return (TRUE);}
+<INITIAL>"false"         {return (FALSE);}
 
-<INITIAL>{id}	              {return (IDENT);}
-<INITIAL>{number}	          {return (INTCONST);}
+<INITIAL>{ident}	              {return (IDENT);}
+<INITIAL>{number}	          {return (INT);}
 
-<INITIAL>"<"	          {return (RELOP);}
-<INITIAL>"<="	          {return (RELOP);}
-<INITIAL>">"	          {return (RELOP);}
-<INITIAL>">="	          {return (RELOP);}
-<INITIAL>"=="	          {return (RELOP);}
-<INITIAL>"!="	          {return (RELOP);}
-<INITIAL>"&&"	          {return (RELOP);}
-<INITIAL>"||"	          {return (RELOP);}
-
-<INITIAL>"="	          {return (RELOP);}
-
-<INITIAL>"+"	          {return (RELOP);}
-<INITIAL>"-"	          {return (RELOP);}
-<INITIAL>"*"	          {return (RELOP);}
-<INITIAL>"/"	          {return (RELOP);}
-<INITIAL>"%"
+<INITIAL>"<"	          {return (LT);}
+<INITIAL>">"              {return (GT);}
+<INITIAL>"<="	          {return (LE);}
+<INITIAL>">="	          {return (GE);}
+<INITIAL>"=="	          {return (EQ);}
+<INITIAL>"!="	          {return (NE);}
 
 
-<INITIAL>";"	          {return (RELOP);}
-<INITIAL>"."	          {return (RELOP);}
-<INITIAL>","	          {return (RELOP);}
+<INITIAL>"="	          {return (ASSIGN);}
+<INITIAL>"+"	          {return (PLUS);}
+<INITIAL>"-"	          {return (MINUS);}
+<INITIAL>"*"	          {return (MULTI);}
+<INITIAL>"/"	          {return (DIVIDE);}
+<INITIAL>"%"              {return (MOD);}
+<INITIAL>"&&"	          {return (AND);}
+<INITIAL>"||"	          {return (OR);}
+<INITIAL>"!"              {return (NOT);}
 
-<INITIAL>"("	          {return (RELOP);}
-<INITIAL>")"	          {return (RELOP);}
-<INITIAL>"["	          {return (RELOP);}
-<INITIAL>"]"	          {return (RELOP);}
-<INITIAL>"{"	          {return (RELOP);}
-<INITIAL>"}"	          {return (RELOP);}
+
+<INITIAL>";"	          {return (SEMICOLON);}
+<INITIAL>","	          {return (COMMA);}
+
+<INITIAL>"("	          {return (LPARENTHESIS);}
+<INITIAL>")"	          {return (RPARENTHESIS);}
+<INITIAL>"["	          {return (LBRACKET);}
+<INITIAL>"]"	          {return (RBRACKET);}
+<INITIAL>"{"	          {return (LBRACE);}
+<INITIAL>"}"	          {return (RBRACE);}
 
 
 <INITIAL>.				  {return ERRORCHAR;}
@@ -107,25 +115,48 @@ int yywrap (){
 void writeout(int c){
   switch(c){
   	case ERRORCHAR: fprintf(yyout, "(ERRORCHAR, \"%s\") ", yytext);break;
-  	case RELOP: fprintf(yyout, "(RELOP, \"%s\") ", yytext);break;  
-	
-    case WHILE: fprintf(yyout, "(WHILE, \"%s\") ", yytext);break;
-    case DO: fprintf(yyout, "(DO, \"%s\") ", yytext);break;
-	case IF: fprintf(yyout, "(IF, \"%s\") ", yytext);break;
+  
+    case IF: fprintf(yyout, "(IF, \"%s\") ", yytext);break;
 	case ELSE: fprintf(yyout, "(ELSE, \"%s\") ", yytext);break;	
+	case WHILE: fprintf(yyout, "(WHILE, \"%s\") ", yytext);break;
 	case STRUCT: fprintf(yyout, "(STRUCT, \"%s\") ", yytext);break;
 	case INT: fprintf(yyout, "(INT, \"%s\") ", yytext);break;
 	case BOOL: fprintf(yyout, "(BOOL, \"%s\") ", yytext);break;
+	case RETURN: fprintf(yyout, "(RETURN, \"%s\") ", yytext);break;
+	case TRUE: fprintf(yyout, "(TRUE, \"%s\") ", yytext);break;
+	case FALSE: fprintf(yyout, "(FALSE, \"%s\") ", yytext);break;  
 	
+	case LT: fprintf(yyout, "(LT, \"%s\") ", yytext);break;  
+    case GT: fprintf(yyout, "(GT, \"%s\") ", yytext);break;  
+    case LE: fprintf(yyout, "(LE, \"%s\") ", yytext);break; 
+    case GE: fprintf(yyout, "(GE, \"%s\") ", yytext);break; 
+    case EQ: fprintf(yyout, "(EQ, \"%s\") ", yytext);break;   	
+	case NE: fprintf(yyout, "(NE, \"%s\") ", yytext);break;  
+	
+	case LPARENTHESIS: fprintf(yyout, "(LPARENTHESIS, \"%s\") ", yytext);break;  
+	case RPARENTHESIS: fprintf(yyout, "(RPARENTHESIS, \"%s\") ", yytext);break;  
+	case LBRACKET: fprintf(yyout, "(LBRACKET, \"%s\") ", yytext);break;  
+	case RBRACKET: fprintf(yyout, "(RBRACKET, \"%s\") ", yytext);break;  
+	case LBRACE: fprintf(yyout, "(LBRACE, \"%s\") ", yytext);break;  
+	case RBRACE: fprintf(yyout, "(RBRACE, \"%s\") ", yytext);break;  
+	
+	case COMMA: fprintf(yyout, "(COMMA, \"%s\") ", yytext);break;  
+	case SEMICOLON: fprintf(yyout, "(SEMICOLON, \"%s\") ", yytext);break;  
+	case PLUS: fprintf(yyout, "(PLUS, \"%s\") ", yytext);break;  
+	case MINUS: fprintf(yyout, "(MINUS, \"%s\") ", yytext);break;  
+	case MULTI: fprintf(yyout, "(MULTI, \"%s\") ", yytext);break;
+	case DIVIDE: fprintf(yyout, "(DIVIDE, \"%s\") ", yytext);break;  
+	case MOD: fprintf(yyout, "(MOD, \"%s\") ", yytext);break;
+	case ASSIGN: fprintf(yyout, "(ASSIGN, \"%s\") ", yytext);break;
+	case AND: fprintf(yyout, "(AND, \"%s\") ", yytext);break;
+	case OR: fprintf(yyout, "(OR, \"%s\") ", yytext);break;
+	case NOT: fprintf(yyout, "(NOT, \"%s\") ", yytext);break;
+    
 	case IDENT: fprintf(yyout, "(IDENT, \"%s\") ", yytext);break;
-	case INTCONST: fprintf(yyout, "(INTCONST, \"%s\") ", yytext);break;
+	case NUMBER: fprintf(yyout, "(NUMBER, \"%s\") ", yytext);break;
 	
-	
-    case WS     : fprintf(yyout," ",yytext);break;
+	case WS     : fprintf(yyout," ",yytext);break;
     case NEWLINE: fprintf(yyout, "");break;
-	
-
-
     
     default:break;
   }
