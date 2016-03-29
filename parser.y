@@ -20,7 +20,7 @@ void yyerror(char *s)
 }
 
  /* 定义各个终结符，以及他们的属性值的类型 */
-%token IDENT INT BOOL STRUCT NUMBER COMMA LPARENTHESIS RPARENTHESIS SEMICOLON LBRACE RBRACE TRUE1 FALSE1  IF ELSE WHILE RETURN /* id */  
+%token IDENT INT BOOL STRUCT NUMBER COMMA SEMICOLON LBRACE RBRACE TRUE1 FALSE1  IF ELSE WHILE RETURN /* id */  
 %right ASSIGN
 %left OR AND
 %left EQ NE
@@ -29,20 +29,26 @@ void yyerror(char *s)
 %left MULTI DIVIDE MOD
 %right NOT UMINUS
 %left POINT
-%left  LBRACKET RBRACKET
+%left  LBRACKET RBRACKET LPARENTHESIS RPARENTHESIS 
 
 
 %debug /* 允许跟踪错误 */
 
 %%
-program : structdeclist vardeclist fundeflist 
-    
+program : dec
         ;
+dec : dec1
+    | structdec dec
+	;
+dec1 : dec2
+     | vardec dec1
+	 ;
+dec2 : 
+      | fundef dec2
+	  ;
 
     
-structdeclist : 
-              | structdec structdeclist
-              ;
+
 structdec : STRUCT IDENT
             LBRACE
             vardec vardeclist
@@ -55,11 +61,8 @@ vardec : type idlist SEMICOLON
        ;
 idlist : IDENT 
        | IDENT COMMA idlist 
-       ;
-       
-fundeflist : 
-           | fundef fundeflist
-           ;
+       ;       
+
 fundef : type IDENT LPARENTHESIS paramlist RPARENTHESIS body
        ;
 paramlist : 
