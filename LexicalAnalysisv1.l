@@ -46,7 +46,7 @@
 
 %}
 /*变量*/
-ident [A-Za-z][0-9A-Za-z]
+ident [A-Za-z][0-9A-Za-z]*
 /*整型常量*/
 number [0-9][0-9]*
 delim		[ \t \n]
